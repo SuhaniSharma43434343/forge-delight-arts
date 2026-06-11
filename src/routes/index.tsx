@@ -29,17 +29,19 @@ const today = new Date().toLocaleDateString("en-US", {
   weekday: "long", month: "long", day: "numeric", year: "numeric",
 });
 
-const stats = [
-  { label: "Total Projects", value: projects.length, hint: "across the studio" },
-  { label: "Active Tasks", value: tasks.filter(t => t.status !== "done").length, hint: "in flight" },
-  { label: "Completed", value: tasks.filter(t => t.status === "done").length, hint: "this cycle" },
-  { label: "Overdue", value: 3, hint: "needs attention", warn: true },
-  { label: "Team", value: 6, hint: "members" },
-];
-
 function Dashboard() {
+  const { projects, tasks } = useStore();
+
+  const stats = [
+    { label: "Total Projects", value: projects.length, hint: "across the studio" },
+    { label: "Active Tasks", value: tasks.filter((t) => t.status !== "done").length, hint: "in flight" },
+    { label: "Completed", value: tasks.filter((t) => t.status === "done").length, hint: "this cycle" },
+    { label: "Overdue", value: tasks.filter((t) => t.status !== "done" && new Date(t.dueDate) < new Date()).length, hint: "needs attention", warn: true },
+    { label: "Team", value: 6, hint: "members" },
+  ];
+
   const upcoming = [...tasks]
-    .filter(t => t.status !== "done")
+    .filter((t) => t.status !== "done")
     .sort((a, b) => +new Date(a.dueDate) - +new Date(b.dueDate))
     .slice(0, 5);
 
@@ -52,11 +54,12 @@ function Dashboard() {
         actions={
           <>
             <Button variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> Invite</Button>
-            <Button variant="outline" className="gap-2"><FolderPlus className="h-4 w-4" /> New project</Button>
-            <Button className="gap-2"><Plus className="h-4 w-4" /> New task</Button>
+            <CreateProjectDialog trigger={<Button variant="outline" className="gap-2"><FolderPlus className="h-4 w-4" /> New project</Button>} />
+            <CreateTaskDialog trigger={<Button className="gap-2"><Plus className="h-4 w-4" /> New task</Button>} />
           </>
         }
       />
+
 
       <section className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
         {stats.map((s) => (
