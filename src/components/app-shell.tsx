@@ -7,6 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CreateTaskDialog } from "@/components/create-task-dialog";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -67,9 +68,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search projects, tasks, people…" className="pl-9 bg-card border-border" />
           </div>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Plus className="h-4 w-4" /> New task
-          </Button>
+          <CreateTaskDialog trigger={
+            <Button variant="outline" size="sm" className="gap-2">
+              <Plus className="h-4 w-4" /> New task
+            </Button>
+          } />
           <Button variant="ghost" size="icon" aria-label="Notifications">
             <Bell className="h-4 w-4" />
           </Button>
