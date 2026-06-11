@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { activity, getMember, projects, tasks, weeklyCompleted, workload } from "@/lib/mock-data";
+import { activity, getMember, weeklyCompleted, workload } from "@/lib/mock-data";
+import { useStore } from "@/lib/store";
+import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { CreateTaskDialog } from "@/components/create-task-dialog";
 import { Plus, FolderPlus, UserPlus, ArrowUpRight, CalendarClock } from "lucide-react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
