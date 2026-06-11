@@ -124,7 +124,7 @@ function ProjectDetail() {
           <Card className="p-6 bg-card border-border">
             <div className="font-display text-xl mb-4">Team</div>
             <ul className="space-y-3">
-              {project.memberIds.map(id => {
+              {project.memberIds.map((id: string) => {
                 const m = getMember(id);
                 return (
                   <li key={id} className="flex items-center gap-3">
