@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { AvatarStack } from "@/components/avatar-stack";
@@ -7,22 +7,19 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { activity, getMember, getProject, tasks } from "@/lib/mock-data";
-import { ArrowLeft, FileText, Image as ImageIcon, Download } from "lucide-react";
+import { activity, getMember } from "@/lib/mock-data";
+import { useProject, useStore } from "@/lib/store";
+import { CreateTaskDialog } from "@/components/create-task-dialog";
+import { ArrowLeft, FileText, Image as ImageIcon, Download, Plus } from "lucide-react";
 import {
   CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 
 export const Route = createFileRoute("/projects/$id")({
-  loader: ({ params }) => {
-    const project = getProject(params.id);
-    if (!project) throw notFound();
-    return { project };
-  },
-  head: ({ loaderData }) => ({
+  head: () => ({
     meta: [
-      { title: `${loaderData?.project?.name ?? "Project"} — Atelier` },
-      { name: "description", content: loaderData?.project?.description ?? "Project details" },
+      { title: "Project — Atelier" },
+      { name: "description", content: "Project details" },
     ],
   }),
   notFoundComponent: () => (
@@ -46,8 +43,22 @@ export const Route = createFileRoute("/projects/$id")({
 });
 
 function ProjectDetail() {
-  const { project } = Route.useLoaderData();
-  const projectTasks = tasks.filter(t => t.projectId === project.id);
+  const { id } = Route.useParams();
+  const project = useProject(id);
+  const { tasks } = useStore();
+
+  if (!project) {
+    return (
+      <AppShell>
+        <div className="text-center py-20">
+          <h2 className="font-display text-3xl">Project not found</h2>
+          <Link to="/projects" className="text-terracotta mt-4 inline-block">Back to projects</Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const projectTasks = tasks.filter((t) => t.projectId === project.id);
 
   const burnup = Array.from({ length: 8 }, (_, i) => ({
     week: `W${i + 1}`,
@@ -156,7 +167,13 @@ function ProjectDetail() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tasks" className="mt-6">
+        <TabsContent value="tasks" className="mt-6 space-y-4">
+          <div className="flex justify-end">
+            <CreateTaskDialog
+              defaultProjectId={project.id}
+              trigger={<Button className="gap-2"><Plus className="h-4 w-4" /> Add task to {project.name}</Button>}
+            />
+          </div>
           <Card className="bg-card border-border overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-paper-2 text-left">
