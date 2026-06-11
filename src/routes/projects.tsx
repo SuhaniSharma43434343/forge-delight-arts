@@ -11,8 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { projects } from "@/lib/mock-data";
+import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { useStore } from "@/lib/store";
 import { Plus, Search, Archive, Calendar } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -29,15 +31,16 @@ const statusLabel: Record<string, string> = {
 };
 
 function ProjectsPage() {
+  const { projects, archiveProject } = useStore();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
 
   const filtered = useMemo(() => {
-    return projects.filter(p =>
+    return projects.filter((p) =>
       (status === "all" || p.status === status) &&
       (q === "" || p.name.toLowerCase().includes(q.toLowerCase()))
     );
-  }, [q, status]);
+  }, [projects, q, status]);
 
   return (
     <AppShell>
@@ -45,7 +48,9 @@ function ProjectsPage() {
         eyebrow="Workspace"
         title="Projects"
         description="A library of everything the studio is building. Search, filter, or open one to dive in."
-        actions={<Button className="gap-2"><Plus className="h-4 w-4" /> New project</Button>}
+        actions={
+          <CreateProjectDialog trigger={<Button className="gap-2"><Plus className="h-4 w-4" /> New project</Button>} />
+        }
       />
 
       <div className="flex flex-col md:flex-row gap-3 mb-6">
@@ -63,13 +68,20 @@ function ProjectsPage() {
             <SelectItem value="archived">Archived</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" className="gap-2"><Archive className="h-4 w-4" /> Archive view</Button>
       </div>
 
+      {filtered.length === 0 && (
+        <Card className="p-12 bg-card border-border text-center">
+          <div className="font-display text-2xl">No projects yet</div>
+          <p className="text-muted-foreground text-sm mt-1">Create your first project to get started.</p>
+          <CreateProjectDialog trigger={<Button className="gap-2 mt-4 mx-auto"><Plus className="h-4 w-4" /> New project</Button>} />
+        </Card>
+      )}
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filtered.map(p => (
-          <Link key={p.id} to="/projects/$id" params={{ id: p.id }}>
-            <Card className="p-6 bg-card border-border h-full hover:border-ink/40 transition-colors group">
+        {filtered.map((p) => (
+          <Card key={p.id} className="p-6 bg-card border-border h-full hover:border-ink/40 transition-colors group flex flex-col">
+            <Link to="/projects/$id" params={{ id: p.id }} className="flex-1">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: p.color }} />
@@ -98,8 +110,20 @@ function ProjectsPage() {
                   <span className="font-medium text-foreground">{p.taskCount}</span> tasks
                 </div>
               </div>
-            </Card>
-          </Link>
+            </Link>
+            {p.status !== "archived" && (
+              <div className="mt-4 pt-4 border-t border-border flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-muted-foreground hover:text-foreground"
+                  onClick={(e) => { e.preventDefault(); archiveProject(p.id); toast.success(`Archived "${p.name}"`); }}
+                >
+                  <Archive className="h-3.5 w-3.5" /> Archive
+                </Button>
+              </div>
+            )}
+          </Card>
         ))}
       </div>
     </AppShell>
