@@ -167,7 +167,13 @@ function ProjectDetail() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tasks" className="mt-6">
+        <TabsContent value="tasks" className="mt-6 space-y-4">
+          <div className="flex justify-end">
+            <CreateTaskDialog
+              defaultProjectId={project.id}
+              trigger={<Button className="gap-2"><Plus className="h-4 w-4" /> Add task to {project.name}</Button>}
+            />
+          </div>
           <Card className="bg-card border-border overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-paper-2 text-left">
