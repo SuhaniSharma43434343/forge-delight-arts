@@ -2,14 +2,26 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import {
   projects as seedProjects,
   tasks as seedTasks,
+  sprints as seedSprints,
+  meetings as seedMeetings,
+  leaves as seedLeaves,
+  team as seedTeam,
   type Project,
   type Task,
   type TaskStatus,
+  type Sprint,
+  type Meeting,
+  type Leave,
+  type TeamMember,
 } from "./mock-data";
 
 interface StoreState {
   projects: Project[];
   tasks: Task[];
+  sprints: Sprint[];
+  meetings: Meeting[];
+  leaves: Leave[];
+  team: TeamMember[];
   addProject: (p: Omit<Project, "id" | "progress" | "taskCount" | "memberIds"> & { memberIds?: string[] }) => Project;
   updateProject: (id: string, patch: Partial<Project>) => void;
   archiveProject: (id: string) => void;
@@ -17,12 +29,15 @@ interface StoreState {
   updateTask: (id: string, patch: Partial<Task>) => void;
   moveTask: (id: string, status: TaskStatus) => void;
   deleteTask: (id: string) => void;
+  addMember: (m: Omit<TeamMember, "id">) => TeamMember;
+  updateMemberRole: (id: string, role: string) => void;
+  removeMember: (id: string) => void;
 }
 
 const Ctx = createContext<StoreState | null>(null);
-const KEY = "atelier-store-v1";
+const KEY = "atelier-store-v2";
 
-function load(): { projects: Project[]; tasks: Task[] } | null {
+function load(): { projects: Project[]; tasks: Task[]; sprints?: Sprint[]; meetings?: Meeting[]; leaves?: Leave[]; team?: TeamMember[] } | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(KEY);
@@ -36,6 +51,10 @@ function load(): { projects: Project[]; tasks: Task[] } | null {
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<Project[]>(seedProjects);
   const [tasks, setTasks] = useState<Task[]>(seedTasks);
+  const [sprints, setSprints] = useState<Sprint[]>(seedSprints);
+  const [meetings, setMeetings] = useState<Meeting[]>(seedMeetings);
+  const [leaves, setLeaves] = useState<Leave[]>(seedLeaves);
+  const [team, setTeam] = useState<TeamMember[]>(seedTeam);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -43,18 +62,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (saved) {
       setProjects(saved.projects);
       setTasks(saved.tasks);
+      if (saved.sprints) setSprints(saved.sprints);
+      if (saved.meetings) setMeetings(saved.meetings);
+      if (saved.leaves) setLeaves(saved.leaves);
+      if (saved.team) setTeam(saved.team);
     }
     setHydrated(true);
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(KEY, JSON.stringify({ projects, tasks }));
-  }, [projects, tasks, hydrated]);
+    localStorage.setItem(KEY, JSON.stringify({ projects, tasks, sprints, meetings, leaves, team }));
+  }, [projects, tasks, sprints, meetings, leaves, team, hydrated]);
 
   const value = useMemo<StoreState>(() => ({
     projects,
     tasks,
+    sprints,
+    meetings,
+    leaves,
+    team,
     addProject: (p) => {
       const project: Project = {
         id: `p${Date.now()}`,
@@ -95,7 +122,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       }
     },
-  }), [projects, tasks]);
+    addMember: (m) => {
+      const member = { ...m, id: `u${Date.now()}` };
+      setTeam((prev) => [...prev, member]);
+      return member;
+    },
+    updateMemberRole: (id, role) => {
+      setTeam((prev) => prev.map(m => m.id === id ? { ...m, role } : m));
+    },
+    removeMember: (id) => {
+      setTeam((prev) => prev.filter(m => m.id !== id));
+    },
+  }), [projects, tasks, sprints, meetings, leaves, team]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

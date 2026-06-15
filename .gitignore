@@ -20,6 +20,10 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Bun (package manager)
+bun.lock
+bunfig.toml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

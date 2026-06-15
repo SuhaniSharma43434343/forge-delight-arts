@@ -43,6 +43,31 @@ export interface ActivityItem {
   timestamp: string;
 }
 
+export interface Sprint {
+  id: string;
+  projectId: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  attendees: string[];
+}
+
+export interface Leave {
+  id: string;
+  memberId: string;
+  type: "vacation" | "sick" | "parental";
+  startDate: string;
+  endDate: string;
+}
+
 export const team: TeamMember[] = [
   { id: "u1", name: "Amelia Hart", role: "Product Designer", email: "amelia@studio.co", avatarColor: "var(--terracotta)", initials: "AH" },
   { id: "u2", name: "Theo Marsh", role: "Engineering Lead", email: "theo@studio.co", avatarColor: "var(--sage)", initials: "TM" },
@@ -96,6 +121,25 @@ export const activity: ActivityItem[] = [
   { id: "a4", actorId: "u3", action: "moved to In Progress", target: "Build dashboard charts", timestamp: "6h ago" },
   { id: "a5", actorId: "u6", action: "filed bug on", target: "QA checkout edge cases", timestamp: "1d ago" },
   { id: "a6", actorId: "u5", action: "merged PR for", target: "Wire up Stripe webhook for invoices", timestamp: "1d ago" },
+];
+
+export const sprints: Sprint[] = [
+  { id: "s1", projectId: "p1", name: "Sprint 14", startDate: "2026-06-01", endDate: "2026-06-14" },
+  { id: "s2", projectId: "p2", name: "Sprint 8", startDate: "2026-06-08", endDate: "2026-06-21" },
+  { id: "s3", projectId: "p4", name: "Sprint 22", startDate: "2026-06-15", endDate: "2026-06-28" },
+];
+
+export const meetings: Meeting[] = [
+  { id: "m1", title: "Design Sync", date: "2026-06-12", startTime: "10:00", endTime: "11:00", attendees: ["u1", "u3", "u4"] },
+  { id: "m2", title: "All Hands", date: "2026-06-12", startTime: "14:00", endTime: "15:00", attendees: ["u1", "u2", "u3", "u4", "u5", "u6"] },
+  { id: "m3", title: "Sprint Planning", date: "2026-06-15", startTime: "09:30", endTime: "11:00", attendees: ["u2", "u4", "u5"] },
+  { id: "m4", title: "Client Demo", date: "2026-06-18", startTime: "13:00", endTime: "14:30", attendees: ["u1", "u4"] },
+];
+
+export const leaves: Leave[] = [
+  { id: "l1", memberId: "u2", type: "vacation", startDate: "2026-06-05", endDate: "2026-06-10" },
+  { id: "l2", memberId: "u5", type: "sick", startDate: "2026-06-12", endDate: "2026-06-12" },
+  { id: "l3", memberId: "u3", type: "vacation", startDate: "2026-06-22", endDate: "2026-06-26" },
 ];
 
 export const weeklyCompleted = [
