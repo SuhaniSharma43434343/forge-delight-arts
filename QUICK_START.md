@@ -83,45 +83,9 @@ npm run preview
 
 ---
 
-## ✅ Migration Status
 
-This project has been migrated from Bun to npm.
 
-**All files removed:**
-- ❌ bun.lock
-- ❌ bunfig.toml
 
-**All files present:**
-- ✅ package.json (npm format)
-- ✅ package-lock.json (npm lock file)
-- ✅ All 465 dependencies installed
-
----
-
-## 🐛 Troubleshooting
-
-### Dev server won't start
-```bash
-# Clear node_modules and reinstall
-rm -r node_modules
-npm install
-npm run dev
-```
-
-### Port 8080 already in use
-```bash
-# Vite will prompt to use a different port
-# Or manually specify:
-npm run dev -- --port 3000
-```
-
-### TypeScript errors
-```bash
-# Rebuild TypeScript cache
-npm run lint
-```
-
----
 
 ## 📖 Additional Resources
 
